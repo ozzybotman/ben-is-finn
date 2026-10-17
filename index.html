@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ben Is Finn</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Georgia', serif;
+      background: #fdf6e3;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    h1 {
+      font-size: 2.8rem;
+      color: #2c1810;
+      margin-bottom: 0.5rem;
+      text-align: center;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      color: #7a5c3a;
+      font-size: 1rem;
+      margin-bottom: 2.5rem;
+      text-align: center;
+      font-style: italic;
+    }
+
+    .stage {
+      display: flex;
+      align-items: flex-start;
+      gap: 3rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .face-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .face-container {
+      position: relative;
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      overflow: hidden;
+      cursor: pointer;
+      user-select: none;
+      box-shadow: 0 8px 32px rgba(44, 24, 16, 0.2);
+      transition: transform 0.1s;
+    }
+
+    .face-container:active {
+      transform: scale(0.97);
+    }
+
+    .face-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .nose-target {
+      position: absolute;
+      width: 60px;
+      height: 50px;
+      top: 44%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .hint {
+      font-size: 0.85rem;
+      color: #9a7a5a;
+      font-style: italic;
+    }
+
+    .joke-panel {
+      width: 300px;
+      min-height: 160px;
+      background: white;
+      border: 2px solid #e8d5b0;
+      border-radius: 16px;
+      padding: 1.5rem 1.8rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      box-shadow: 0 4px 20px rgba(44, 24, 16, 0.08);
+    }
+
+    .joke-panel.hidden {
+      opacity: 0.3;
+    }
+
+    .joke-panel::before {
+      content: '👈';
+      position: absolute;
+      left: -2rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.4rem;
+    }
+
+    .joke-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #b8956a;
+      margin-bottom: 0.8rem;
+      font-family: monospace;
+    }
+
+    .joke-setup {
+      font-size: 1.1rem;
+      color: #2c1810;
+      margin-bottom: 0.8rem;
+      line-height: 1.45;
+      min-height: 2.5em;
+    }
+
+    .joke-punchline {
+      font-size: 1.05rem;
+      color: #5a3a1a;
+      font-weight: bold;
+      line-height: 1.4;
+      min-height: 2em;
+      transition: opacity 0.3s;
+    }
+
+    .joke-punchline.hidden {
+      opacity: 0;
+    }
+
+    .reveal-btn {
+      margin-top: 1rem;
+      background: #2c1810;
+      color: #fdf6e3;
+      border: none;
+      border-radius: 8px;
+      padding: 0.5rem 1.2rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      font-family: 'Georgia', serif;
+      transition: background 0.2s;
+    }
+
+    .reveal-btn:hover { background: #5a3a1a; }
+
+    .counter {
+      margin-top: 2.5rem;
+      font-size: 0.85rem;
+      color: #9a7a5a;
+      text-align: center;
+    }
+
+    .mouth-overlay {
+      position: absolute;
+      bottom: 22%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 70px;
+      height: 0;
+      background: #1a0a04;
+      border-radius: 50% 50% 50% 50% / 30% 30% 70% 70%;
+      transition: height 0.25s ease-out;
+      pointer-events: none;
+    }
+
+    .mouth-overlay.open { height: 40px; }
+
+    /* Placeholder face when no image */
+    .face-placeholder {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #d4a96a, #b8826a);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 5rem;
+    }
+
+    @media (max-width: 680px) {
+      .joke-panel::before { display: none; }
+      .stage { flex-direction: column; align-items: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Ben Is Finn</h1>
+  <p class="subtitle">The parody you never asked for, but absolutely deserved.</p>
+
+  <div class="stage">
+    <div class="face-wrap">
+      <div class="face-container" id="faceContainer" title="Flick the nose!">
+        <img id="faceImg" src="finn.jpg" alt="Ben / Finn"
+          onerror="this.style.display='none'; document.getElementById('facePlaceholder').style.display='flex';" />
+        <div class="face-placeholder" id="facePlaceholder" style="display:none">🧑</div>
+        <div class="mouth-overlay" id="mouthOverlay"></div>
+        <div class="nose-target" id="noseTarget"></div>
+      </div>
+      <p class="hint">👆 flick his nose</p>
+    </div>
+
+    <div class="joke-panel hidden" id="jokePanel">
+      <div class="joke-label">Dad Joke #<span id="jokeNum">1</span></div>
+      <div class="joke-setup" id="jokeSetup"></div>
+      <div class="joke-punchline hidden" id="jokePunchline"></div>
+      <button class="reveal-btn" id="revealBtn" onclick="revealPunchline()">Reveal punchline</button>
+    </div>
+  </div>
+
+  <div class="counter" id="counter" style="display:none">
+    Nose flicks: <strong id="flickCount">0</strong>
+  </div>
+
+  <script>
+    const jokes = [
+      { setup: "Why don't scientists trust atoms?", punchline: "Because they make up everything." },
+      { setup: "What do you call a fake noodle?", punchline: "An impasta." },
+      { setup: "Why did the scarecrow win an award?", punchline: "Because he was outstanding in his field." },
+      { setup: "I'm reading a book about anti-gravity.", punchline: "It's impossible to put down." },
+      { setup: "Did you hear about the claustrophobic astronaut?", punchline: "He just needed a little space." },
+      { setup: "Why can't you give Elsa a balloon?", punchline: "Because she'll let it go." },
+      { setup: "What do you call cheese that isn't yours?", punchline: "Nacho cheese." },
+      { setup: "I used to hate facial hair...", punchline: "But then it grew on me." },
+      { setup: "What do you call a fish without eyes?", punchline: "A fsh." },
+      { setup: "Why do cows wear bells?", punchline: "Because their horns don't work." },
+      { setup: "I told my wife she was drawing her eyebrows too high.", punchline: "She looked surprised." },
+      { setup: "What do you call a sleeping dinosaur?", punchline: "A dino-snore." },
+      { setup: "Why did the bicycle fall over?", punchline: "Because it was two-tired." },
+      { setup: "What's brown and sticky?", punchline: "A stick." },
+      { setup: "I asked my dog what two minus two is.", punchline: "He said nothing." },
+      { setup: "Why don't eggs tell jokes?", punchline: "They'd crack each other up." },
+      { setup: "What do you call a bear with no teeth?", punchline: "A gummy bear." },
+      { setup: "Why did the math book look so sad?", punchline: "Because it had too many problems." },
+      { setup: "Why did the golfer bring extra pants?", punchline: "In case he got a hole in one." },
+      { setup: "What do you call a dinosaur that crashes their car?", punchline: "Tyrannosaurus wrecks." },
+    ];
+
+    let flicks = 0;
+    let currentJoke = null;
+    const usedIndices = new Set();
+
+    function pickJoke() {
+      if (usedIndices.size >= jokes.length) usedIndices.clear();
+      let idx;
+      do { idx = Math.floor(Math.random() * jokes.length); } while (usedIndices.has(idx));
+      usedIndices.add(idx);
+      return jokes[idx];
+    }
+
+    function openMouth() {
+      const mouth = document.getElementById('mouthOverlay');
+      mouth.classList.add('open');
+      setTimeout(() => mouth.classList.remove('open'), 600);
+    }
+
+    function showJoke() {
+      currentJoke = pickJoke();
+      document.getElementById('jokeNum').textContent = flicks;
+      document.getElementById('jokeSetup').textContent = currentJoke.setup;
+      document.getElementById('jokePunchline').textContent = currentJoke.punchline;
+      document.getElementById('jokePunchline').classList.add('hidden');
+      document.getElementById('revealBtn').style.display = 'inline-block';
+      document.getElementById('jokePanel').classList.remove('hidden');
+    }
+
+    function revealPunchline() {
+      document.getElementById('jokePunchline').classList.remove('hidden');
+      document.getElementById('revealBtn').style.display = 'none';
+    }
+
+    function onFlick() {
+      flicks++;
+      openMouth();
+      showJoke();
+      const counter = document.getElementById('counter');
+      counter.style.display = 'block';
+      document.getElementById('flickCount').textContent = flicks;
+    }
+
+    document.getElementById('faceContainer').addEventListener('click', onFlick);
+  </script>
+
+</body>
+</html>
